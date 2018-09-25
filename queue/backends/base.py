@@ -15,8 +15,8 @@ class BaseQueueWrapper:
         conn_params = self.get_conn_params()
         self.connection = self.new_connection(conn_params)
 
-    def push(self):
-        pass
+    def push(self, **data):
+        raise NotImplementedError('subclasses of BaseQueueWrapper may require a push() method')
 
     def pop(self):
-        pass
+        raise NotImplementedError('subclasses of BaseQueueWrapper may require a pop() method')
