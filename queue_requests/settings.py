@@ -116,6 +116,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+AUTH_USER_MODEL = 'accounts.User'
+
 QUEUE_SERVER = None
 
 REDIS_HOST = 'localhost'
@@ -135,6 +138,8 @@ CACHES = {
         }
     }
 }
+
+LOGIN_REDIRECT_URL = '/accounts/index/'
 
 try:
     from .local_settings import *
