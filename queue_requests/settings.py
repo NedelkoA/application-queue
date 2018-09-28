@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'accounts',
+    'application',
+    'users',
+    'operators',
 ]
 
 MIDDLEWARE = [
@@ -119,7 +122,12 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'accounts.User'
 
-QUEUE_SERVER = None
+QUEUE_SERVER = {
+    'ENGINE': 'myqueue.backends.redis_queue.RedisQueue',
+    'HOST': 'localhost',
+    'PORT': '6379',
+    'DB': 1,
+}
 
 REDIS_HOST = 'localhost'
 REDIS_PORT = '6379'
@@ -140,6 +148,37 @@ CACHES = {
 }
 
 LOGIN_REDIRECT_URL = '/accounts/index/'
+LOGIN_URL = 'login'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'info.log',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'state_info': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True
+        },
+    },
+}
 
 try:
     from .local_settings import *

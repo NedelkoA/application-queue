@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div>
+        {% for app in object_list %}
+            <p><a href="{% url 'request_detail' app.id %}">{{ app.id }}</a> Status: {{ app.status }} {{ app.updated_on }}</p>
+        {% endfor %}
+    </div>
+    <div>
+        {% for app in successed_list %}
+            <p><a href="{% url 'request_detail' app.id %}">{{ app.id }}</a> Status: {{ app.status }} {{ app.updated_on }}</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

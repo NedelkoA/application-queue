@@ -2,8 +2,7 @@ import json
 
 import pika
 
-from queue.backends.base import BaseQueueWrapper
-# from settings import QUEUE_SERVER
+from myqueue.backends.base import BaseQueueWrapper
 
 
 class RabbitmqQueue(BaseQueueWrapper):

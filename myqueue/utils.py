@@ -13,7 +13,4 @@ def _get_queue(queue_data):
 def get_connection():
     queue = _get_queue(settings.QUEUE_SERVER)(settings.QUEUE_SERVER)
     queue.connect()
-    return queue.connection
-
-
-# connect = get_connection()
+    return queue

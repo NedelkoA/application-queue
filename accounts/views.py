@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, reverse
 from django.contrib.auth import authenticate, login
-from django.views.generic import CreateView, UpdateView, TemplateView
+from django.views.generic import CreateView, TemplateView
 from django.urls import reverse_lazy
 
 from .forms import RegistrationForm

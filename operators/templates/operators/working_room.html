@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {{ error }}
+    <p>Количество заявок в очереди: {{ all_items }}</p>
+    <form method="POST" action="{% url 'get_request' %}">
+                {% csrf_token %}
+                <button type="submit">Get request from queue</button>
+    </form>
+</body>
+</html>
