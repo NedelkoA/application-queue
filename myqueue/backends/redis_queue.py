@@ -29,18 +29,6 @@ class RedisQueue(BaseQueueWrapper):
         if data:
             return json.loads(data)
 
-
-# r = RedisQueue(QUEUE_SERVER)
-# da = {
-#     'asd': 'hello',
-#     'some': 'good bye'
-# }
-# da_2 = {
-#     'asd': 'hello1',
-#     'some': 'good bye1'
-# }
-# r.connect()
-# print(r.connection)
-# r.push(**da)
-# r.push(**da_2)
-# print(r.pop())
+    @property
+    def count_items(self):
+        return self.connection.llen('item_list')

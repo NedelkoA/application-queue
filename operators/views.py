@@ -1,15 +1,12 @@
-import logging
-
 from django.views.generic import TemplateView, UpdateView
 from django.shortcuts import redirect, reverse, render
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 
 from users.models import Application
 from myqueue.utils import get_connection
-from .models import MyApplication
+from .models import MyApplication, ChangeLog
 from .utils.state import change_state
-
-logger = logging.getLogger('state_info')
 
 
 class GetRequestView(TemplateView, LoginRequiredMixin):
@@ -18,28 +15,29 @@ class GetRequestView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         connect = get_connection()
         context = super().get_context_data(**kwargs)
-        context['all_items'] = connect.connection.llen('item_list')
+        context['all_items'] = connect.count_items
         return context
 
     def post(self, request):
-        if request.method == "POST":
-            connect = get_connection()
-            item = connect.pop()
-            if item:
-                app = Application.objects.get(id=item['id'])
-                obj = change_state(app, 'review')
-                if obj:
-                    logger.info(
-                        'User ' + str(self.request.user) +
-                        ' took application #' + str(obj.id) +
-                        ' from queue and set status \'' + str(obj.status) + '\''
-                    )
-                    obj.save()
-                    MyApplication.objects.create(
-                        operator=self.request.user,
-                        application=obj
-                    )
-                    return redirect(reverse('request_info', kwargs={'pk': item['id']}))
+        connect = get_connection()
+        item = connect.pop()
+        if item:
+            app = Application.objects.get(id=item['id'])
+            obj = change_state(app, 'review')
+            if obj:
+                obj.save()
+                ChangeLog.objects.create(
+                    operator=self.request.user,
+                    application=obj,
+                    updated_on=timezone.now(),
+                    last_state='queue',
+                    current_state=obj.status
+                )
+                MyApplication.objects.create(
+                    operator=self.request.user,
+                    application=obj
+                )
+                return redirect(reverse('request_info', kwargs={'pk': item['id']}))
         return render(request, self.template_name, context={'error': 'Queue is empty'})
 
 
@@ -55,11 +53,12 @@ class RequestInfo(UpdateView, LoginRequiredMixin):
         status = obj.status
         obj = change_state(obj, form.cleaned_data.get('status'))
         if obj:
-            logger.info(
-                'User ' + str(self.request.user) +
-                ' change status from \'' + status +
-                '\' to \'' + obj.status +
-                '\' for application #' + str(obj.id)
+            ChangeLog.objects.create(
+                operator=self.request.user,
+                application=obj,
+                updated_on=timezone.now(),
+                last_state=status,
+                current_state=obj.status
             )
             return super().form_valid(form)
         form.add_error('status', 'This status not allowed')

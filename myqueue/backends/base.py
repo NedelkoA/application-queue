@@ -20,3 +20,7 @@ class BaseQueueWrapper:
 
     def pop(self):
         raise NotImplementedError('subclasses of BaseQueueWrapper may require a pop() method')
+
+    @property
+    def count_items(self):
+        raise NotImplementedError('subclasses of BaseQueueWrapper may require a count_items() method')

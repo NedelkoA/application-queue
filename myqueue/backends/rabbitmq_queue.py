@@ -1,8 +1,15 @@
 import json
+from collections import namedtuple
 
 import pika
 
 from myqueue.backends.base import BaseQueueWrapper
+
+Item = namedtuple('Item', [
+            'channel',
+            'properties',
+            'data'
+        ])
 
 
 class RabbitmqQueue(BaseQueueWrapper):
@@ -14,6 +21,8 @@ class RabbitmqQueue(BaseQueueWrapper):
             conn_params['host'] = self.settings_dict['HOST']
         if self.settings_dict['PORT']:
             conn_params['port'] = self.settings_dict['PORT']
+        if not self.settings_dict['QUEUE_NAME']:
+            raise ValueError('QUEUE_NAME is required!')
         return conn_params
 
     def new_connection(self, connection_params):
@@ -23,36 +32,25 @@ class RabbitmqQueue(BaseQueueWrapper):
 
     def push(self, **data):
         channel = self.connection.channel()
-        channel.queue_declare(queue='item_list')
+        channel.queue_declare(queue=self.settings_dict['QUEUE_NAME'])
         channel.basic_publish(
             exchange='',
-            routing_key='item_list',
+            routing_key=self.settings_dict['QUEUE_NAME'],
             body=json.dumps(data)
         )
 
     def pop(self):
         channel = self.connection.channel()
-        item = channel.basic_get(
-            queue='item_list',
+        queue_item = channel.basic_get(
+            queue=self.settings_dict['QUEUE_NAME'],
             no_ack=True
         )
-        if item[2]:
-            return json.loads(item[2].decode('utf-8'))
+        item = Item(*queue_item)
+        if item.data:
+            return json.loads(item.data.decode('utf-8'))
 
-
-# r = RabbitmqQueue(QUEUE_SERVER)
-# da = {
-#     'asd': 'hello',
-#     'some': 'good bye'
-# }
-# da_2 = {
-#     'asd': 'hello1',
-#     'some': 'good bye1'
-# }
-# r.connect()
-# print(r.connection)
-# r.push(**da)
-# r.push(**da_2)
-# print(r.pop())
-# print(r.pop())
-# r.connection.close()
+    @property
+    def count_items(self):
+        channel = self.connection.channel()
+        rabbit_queue = channel.queue_declare(queue=self.settings_dict['QUEUE_NAME'])
+        return rabbit_queue.method.message_count
