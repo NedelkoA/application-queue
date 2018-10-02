@@ -25,7 +25,7 @@ SECRET_KEY = 'my=$a2_xk@7v@7kjz(h*p!ttw!x!cef&8$!rml_75hb78ow^t&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.20.0.1']
 
 
 # Application definition
@@ -122,12 +122,14 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'accounts.User'
 
-QUEUE_SERVER = {
-    'ENGINE': 'myqueue.backends.RedisQueue',
-    'HOST': 'localhost',
-    'PORT': '6379',
-    'DB': 1,
-}
+QUEUE_SERVER = None
+
+# QUEUE_SERVER = {
+#     'ENGINE': 'myqueue.backends.RedisQueue',
+#     'HOST': 'localhost',
+#     'PORT': '6379',
+#     'DB': 1,
+# }
 
 # QUEUE_SERVER = {
 #     'ENGINE': 'myqueue.backends.RabbitmqQueue',
@@ -136,7 +138,7 @@ QUEUE_SERVER = {
 #     'QUEUE_NAME': 'item_list',
 # }
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = 'redis'
 REDIS_PORT = '6379'
 
 # Redis sessions
