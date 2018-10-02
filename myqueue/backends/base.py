@@ -1,26 +1,31 @@
-class BaseQueueWrapper:
-    name = None
+from abc import ABCMeta, abstractmethod, abstractproperty
 
+
+class BaseQueueWrapper(metaclass=ABCMeta):
     def __init__(self, settings_dict):
         self.settings_dict = settings_dict
         self.connection = None
 
+    @abstractmethod
     def get_conn_params(self):
-        raise NotImplementedError('subclasses of BaseQueueWrapper may require a get_conn_params() method')
+        pass
 
+    @abstractmethod
     def new_connection(self, connection_params):
-        raise NotImplementedError('subclasses of BaseQueueWrapper may require a new_connection() method')
+        pass
 
     def connect(self):
         conn_params = self.get_conn_params()
         self.connection = self.new_connection(conn_params)
 
+    @abstractmethod
     def push(self, **data):
-        raise NotImplementedError('subclasses of BaseQueueWrapper may require a push() method')
+        pass
 
+    @abstractmethod
     def pop(self):
-        raise NotImplementedError('subclasses of BaseQueueWrapper may require a pop() method')
+        pass
 
-    @property
+    @abstractproperty
     def count_items(self):
-        raise NotImplementedError('subclasses of BaseQueueWrapper may require a count_items() method')
+        pass
